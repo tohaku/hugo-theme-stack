@@ -14,6 +14,7 @@ class StackColorScheme {
             this.systemPreferScheme = 'light';
 
         this.dispatchEvent(document.documentElement.dataset.scheme as colorScheme);
+        this.updateBackgroundImage();
 
         if (toggleEl)
             this.bindClick(toggleEl);
@@ -66,6 +67,7 @@ class StackColorScheme {
             document.documentElement.dataset.scheme = 'light';
         }
 
+        this.updateBackgroundImage();
         this.dispatchEvent(document.documentElement.dataset.scheme as colorScheme);
     }
 
@@ -86,6 +88,30 @@ class StackColorScheme {
             }
             this.setBodyClass();
         });
+    }
+
+    private updateBackgroundImage() {
+        if (!document.body) return;
+
+        const scheme = document.documentElement.dataset.scheme === 'dark' ? 'dark' : 'light';
+        const styles = getComputedStyle(document.documentElement);
+        const lightImage = styles.getPropertyValue('--theme-switcher-background-light').trim();
+        const darkImage = styles.getPropertyValue('--theme-switcher-background-dark').trim();
+        const target = scheme === 'dark' ? darkImage : lightImage;
+        const value = target && target !== 'none' ? target : 'none';
+
+        document.body.style.backgroundImage = value;
+        if (value !== 'none') {
+            document.body.style.backgroundAttachment = 'fixed';
+            document.body.style.backgroundRepeat = 'no-repeat';
+            document.body.style.backgroundSize = 'cover';
+            document.body.style.backgroundPosition = 'left bottom';
+        } else {
+            document.body.style.removeProperty('background-attachment');
+            document.body.style.removeProperty('background-repeat');
+            document.body.style.removeProperty('background-size');
+            document.body.style.removeProperty('background-position');
+        }
     }
 }
 
